@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "paths": {
+      "@organization_template/react-client": ["../react-client/src/index.ts"]
+    },
+    "rootDir": "..",
+    "strict": true,
+    "target": "ES2022"
+  },
+  "include": ["src", "../react-client/src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

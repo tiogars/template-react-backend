@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .no-print {
+    display: none !important;
+  }
+
+  .MuiContainer-root {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .print-surface {
+    color: #111;
+  }
+}
