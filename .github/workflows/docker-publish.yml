@@ -1,0 +1,74 @@
+name: Build and publish Docker image
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: template-react-backend
+
+      # Sibling workspace dependency (workspace:../template-react-api-client)
+      - uses: actions/checkout@v4
+        with:
+          repository: tiogars/template-react-api-client
+          path: template-react-api-client
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: template-react-backend/pnpm-lock.yaml
+
+      - name: Build API client
+        working-directory: template-react-api-client
+        run: |
+          pnpm install
+          pnpm run build --if-present
+
+      - name: Package application
+        working-directory: template-react-backend
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm run build
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=sha
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: template-react-backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
