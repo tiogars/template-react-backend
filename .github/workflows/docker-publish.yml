@@ -40,6 +40,9 @@ jobs:
       - name: Build API client
         working-directory: template-react-api-client
         run: |
+          if ! grep -q '^packages:' pnpm-workspace.yaml; then
+            sed -i '1i packages:\n  - .' pnpm-workspace.yaml
+          fi
           pnpm install
           pnpm run build --if-present
 
